@@ -28,6 +28,27 @@ const StorageCtrl = (function () {
         items = JSON.parse(localStorage.getItem('items'));
       }
       return items;
+    },
+    updateItemStorage: function (updatedItem) {
+      let items = JSON.parse(localStorage.getItem('items'));
+      items.forEach(function (item, index) {
+        if (updatedItem.id === item.id) {
+          items.splice(index, 1, updatedItem);
+        }
+      });
+      localStorage.setItem('items', JSON.stringify(items))
+    },
+    deleteItemFromStorage: function (id) {
+      let items = JSON.parse(localStorage.getItem('items'));
+      items.forEach(function (item, index) {
+        if (id === item.id) {
+          items.splice(index, 1);
+        }
+      });
+      localStorage.setItem('items', JSON.stringify(items))
+    },
+    clearItemsFromStorage: function () {
+      localStorage.removeItem('items');
     }
   }
 })();
@@ -343,6 +364,9 @@ const App = (function (ItemCtrl, StorageCtrl, UICtrl) {
     UICtrl.showTotalCalories(totalCalories);
     // Add item to UI list
 
+    // Update local storage
+    StorageCtrl.updateItemStorage(updatedItem)
+
     UICtrl.clearEditState();
     e.preventDefault()
 
@@ -365,6 +389,8 @@ const App = (function (ItemCtrl, StorageCtrl, UICtrl) {
     UICtrl.showTotalCalories(totalCalories);
     // Add item to UI list
 
+    // Delete from local storage
+    StorageCtrl.deleteItemFromStorage(currentItem.id);
     UICtrl.clearEditState();
 
     e.preventDefault();
@@ -374,13 +400,15 @@ const App = (function (ItemCtrl, StorageCtrl, UICtrl) {
   const clearAllItemsClick = function () {
     // Delete all items from data structure
     ItemCtrl.clearAllItems();
-    // Remove from UI
-    UICtrl.removeItems();
 
     const totalCalories = ItemCtrl.getTotalCalories();
     // Add total calories to the UI
     UICtrl.showTotalCalories(totalCalories);
-    // Add item to UI list
+
+    // Remove from UI
+    UICtrl.removeItems();
+    // Clear items from local storage
+    StorageCtrl.clearItemsFromStorage();
 
     UICtrl.clearEditState();
 
